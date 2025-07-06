@@ -3,7 +3,18 @@
   "path": "/",
   "sections": [
     {
-      "__resolveType": "site/sections/HelloWorld.tsx"
+      "__resolveType": "site/sections/About.tsx",
+      "name": "Lucas Gabriel Soares Sacci",
+      "title": "Desenvolvedor Full Stack",
+      "description": "Atualmente trabalho na deco.cx como desenvolvedor fullstack, utilizando Preact e Tailwind CSS para desenvolver soluções de storefront. Além disso, trabalho com inteligência artificial desenvolvendo agents de IA para otimizar processos de empresas clientes, incluindo projetos na plataforma deco.chat, especializada na criação de agents. Busco sempre contribuir com ideias inovadoras para desenvolver soluções que agreguem valor ao ambiente em que estou inserido. Tenho como principais características um perfil comunicativo e colaborativo, sempre disposto a aceitar novos desafios e aprender novas tecnologias!",
+      "avatar": "https://media.licdn.com/dms/image/v2/C4D03AQH0NZaMUuGIhA/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1661819179127?e=1757548800&v=beta&t=3ZRzbTD4KdEGOuYJUBwELVdFQ4Ec2A--z7eMNWS3gZY",
+      "location": "Nazaré Paulista",
+      "email": "saccilucas@gmail.com",
+      "github": "https://github.com/aka-sacci-ccr",
+      "linkedin": "https://www.linkedin.com/in/aka-sacci/",
+      "technologies": [
+        "Teste"
+      ]
     }
   ],
   "__resolveType": "website/pages/Page.tsx"

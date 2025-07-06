@@ -1,0 +1,312 @@
+# Topologia de Componentes - Deco.cx
+
+## Estrutura de Componentes no Deco
+
+### 📁 **sections/**
+
+**Componentes disponíveis no CMS para o usuário escolher**
+
+```
+sections/
+├── Hero.tsx           # Seção Hero disponível no CMS
+├── Footer.tsx         # Seção Footer disponível no CMS
+├── ProductGrid.tsx    # Seção de produtos disponível no CMS
+└── Theme/
+    └── Theme.tsx      # Configuração de tema
+```
+
+**Características:**
+
+- ✅ Aparecem no Visual Editor do Deco
+- ✅ Usuário pode arrastar e soltar
+- ✅ Têm interface para edição de props
+- ✅ São exportados no `manifest.gen.ts`
+
+**Template de Section:**
+
+```tsx
+// sections/Hero.tsx
+interface Props {
+  /*
+    @title Título
+    */
+  title: string;
+  subtitle?: string;
+  backgroundImage?: string;
+}
+
+export default function Hero({ title, subtitle, backgroundImage }: Props) {
+  return (
+    <section className="hero">
+      <div
+        className="hero-bg"
+        style={{ backgroundImage: `url(${backgroundImage})` }}
+      >
+        <h1>{title}</h1>
+        {subtitle && <p>{subtitle}</p>}
+      </div>
+    </section>
+  );
+}
+```
+
+### 📁 **components/**
+
+**Todos os componentes reutilizáveis usados internamente**
+
+```
+components/
+├── ui/
+│   ├── Button.tsx     # Componente Button reutilizável
+│   ├── Card.tsx       # Componente Card reutilizável
+│   └── Icon.tsx       # Componente Icon reutilizável
+├── forms/
+│   ├── ContactForm.tsx
+│   └── NewsletterForm.tsx
+└── layout/
+    ├── Header.tsx
+    └── Navigation.tsx
+```
+
+**Características:**
+
+- ❌ NÃO aparecem no Visual Editor
+- ✅ São reutilizados pelas sections
+- ✅ Podem ser importados em qualquer lugar
+- ✅ Focados em funcionalidade específica
+
+**Template de Component:**
+
+```tsx
+// components/ui/Button.tsx
+interface ButtonProps {
+  variant?: "primary" | "secondary" | "outline";
+  size?: "sm" | "md" | "lg";
+  children: React.ReactNode;
+  onClick?: () => void;
+}
+
+export default function Button({
+  variant = "primary",
+  size = "md",
+  children,
+  onClick,
+}: ButtonProps) {
+  return (
+    <button className={`btn btn-${variant} btn-${size}`} onClick={onClick}>
+      {children}
+    </button>
+  );
+}
+```
+
+## Fluxo de Desenvolvimento
+
+### 1. **Criar Component Base**
+
+```bash
+# Primeiro, criar o componente reutilizável
+touch components/ui/ProductCard.tsx
+```
+
+```tsx
+// components/ui/ProductCard.tsx
+interface ProductCardProps {
+  title: string;
+  price: number;
+  image: string;
+  description?: string;
+}
+
+export default function ProductCard({
+  title,
+  price,
+  image,
+  description,
+}: ProductCardProps) {
+  return (
+    <div className="product-card">
+      <img src={image} alt={title} />
+      <h3>{title}</h3>
+      <p className="price">${price}</p>
+      {description && <p className="description">{description}</p>}
+    </div>
+  );
+}
+```
+
+### 2. **Criar Section que usa o Component**
+
+```bash
+# Depois, criar a section que aparece no CMS
+touch sections/ProductGrid.tsx
+```
+
+```tsx
+// sections/ProductGrid.tsx
+import ProductCard from "../components/ui/ProductCard.tsx";
+
+interface Product {
+  title: string;
+  price: number;
+  image: string;
+  description?: string;
+}
+
+interface Props {
+  title: string;
+  products: Product[];
+  columns?: number;
+}
+
+export default function ProductGrid({ title, products, columns = 3 }: Props) {
+  return (
+    <section className="product-grid">
+      <h2>{title}</h2>
+      <div className={`grid grid-cols-${columns} gap-4`}>
+        {products.map((product, index) => (
+          <ProductCard key={index} {...product} />
+        ))}
+      </div>
+    </section>
+  );
+}
+```
+
+### 3. **Gerar Manifest**
+
+```bash
+deno task gen
+```
+
+Isso vai adicionar a section no `manifest.gen.ts`:
+
+```ts
+// manifest.gen.ts (gerado automaticamente)
+const manifest = {
+  sections: {
+    "site/sections/ProductGrid.tsx": ProductGrid,
+    // ... outras sections
+  },
+  // ...
+};
+```
+
+## Melhores Práticas
+
+### **Para Sections:**
+
+✅ **Faça:**
+
+- Props bem definidas e tipadas
+- Interface amigável para o usuário do CMS
+- Valores padrão sensatos
+- Responsive design
+
+❌ **Evite:**
+
+- Lógica complexa de negócio
+- Chamadas diretas de API
+- Estados complexos
+
+### **Para Components:**
+
+✅ **Faça:**
+
+- Componentes pequenos e focados
+- Reutilização máxima
+- Props flexíveis
+- Testes unitários
+
+❌ **Evite:**
+
+- Componentes muito específicos
+- Dependências desnecessárias
+- Props demais
+
+## Exemplo Completo
+
+### Component Base
+
+```tsx
+// components/ui/Card.tsx
+interface CardProps {
+  title: string;
+  content: string;
+  image?: string;
+  variant?: "default" | "featured";
+}
+
+export default function Card({
+  title,
+  content,
+  image,
+  variant = "default",
+}: CardProps) {
+  return (
+    <div className={`card ${variant === "featured" ? "card-featured" : ""}`}>
+      {image && <img src={image} alt={title} />}
+      <div className="card-content">
+        <h3>{title}</h3>
+        <p>{content}</p>
+      </div>
+    </div>
+  );
+}
+```
+
+### Section que usa o Component
+
+```tsx
+// sections/CardSection.tsx
+import Card from "../components/ui/Card.tsx";
+
+interface CardData {
+  title: string;
+  content: string;
+  image?: string;
+  featured?: boolean;
+}
+
+interface Props {
+  sectionTitle: string;
+  cards: CardData[];
+  backgroundColor?: string;
+}
+
+export default function CardSection({
+  sectionTitle,
+  cards,
+  backgroundColor = "#ffffff",
+}: Props) {
+  return (
+    <section className="card-section py-12" style={{ backgroundColor }}>
+      <div className="container mx-auto">
+        <h2 className="text-3xl font-bold mb-8">{sectionTitle}</h2>
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {cards.map((card, index) => (
+            <Card
+              key={index}
+              title={card.title}
+              content={card.content}
+              image={card.image}
+              variant={card.featured ? "featured" : "default"}
+            />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+```
+
+**Resumo da Topologia:**
+
+- **sections/** = Vai para o CMS (usuário vê e configura)
+- **components/** = Reutilizáveis internos (dev usa)
+- **Sempre criar component primeiro, depois section que usa**
+  description:
+  globs:
+  alwaysApply: false
+
+---
